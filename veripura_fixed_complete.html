@@ -1,0 +1,2781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeriPura - Export Compliance Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --veripura-navy: #1e3a8a;
+            --veripura-blue: #3b82f6;
+            --veripura-light-blue: #60a5fa;
+            --primary-blue: #1e40af;
+            --success-blue: #0f766e;
+            --warning-yellow: #d97706;
+            --danger-red: #dc2626;
+            --info-blue: #0284c7;
+            --demo-orange: #ea580c;
+            --neutral-gray: #6b7280;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        .veripura-logo {
+            width: 32px;
+            height: 32px;
+            margin-right: 10px;
+            background: linear-gradient(135deg, var(--veripura-blue), var(--veripura-navy));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .demo-banner {
+            background: linear-gradient(90deg, var(--demo-orange), #f97316);
+            color: white;
+            text-align: center;
+            padding: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .card-metric {
+            text-align: center;
+            padding: 0.75rem;
+        }
+        
+        .card-metric h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .card-metric p {
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .card-metric small {
+            font-size: 0.75rem;
+        }
+        
+        .po-grid {
+            background: white;
+            border-radius: 0.375rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .po-row {
+            border-bottom: 1px solid #e5e7eb;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+        
+        .po-row:hover {
+            background-color: #f9fafb;
+        }
+        
+        .po-row.expanded {
+            background-color: #f0f9ff;
+        }
+        
+        .po-details {
+            background-color: #f8fafc;
+            padding: 0.75rem;
+            border-left: 3px solid var(--info-blue);
+            font-size: 0.875rem;
+        }
+        
+        .status-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.375rem;
+        }
+        
+        .status-overdue { background-color: #fecaca; color: #991b1b; }
+        .status-due-soon { background-color: #fed7aa; color: #9a3412; }
+        .status-on-track { background-color: #bfdbfe; color: #1e40af; }
+        .status-complete { background-color: #e0f2fe; color: #0f766e; }
+        .status-pending { background-color: #dbeafe; color: #1e40af; }
+        .status-missing { background-color: #fecaca; color: #991b1b; }
+        .status-expiring { background-color: #fed7aa; color: #9a3412; }
+        
+        .metric-card {
+            background: white;
+            border-radius: 0.375rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .metric-card.clickable {
+            cursor: pointer;
+        }
+        
+        .metric-card.clickable:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        
+        .card {
+            border-radius: 0.375rem;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .card-header {
+            padding: 0.75rem 1rem;
+            background-color: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .card-body {
+            padding: 0.75rem 1rem;
+        }
+        
+        .table {
+            font-size: 0.875rem;
+            margin-bottom: 0;
+        }
+        
+        .table th {
+            padding: 0.5rem 0.75rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .table td {
+            padding: 0.5rem 0.75rem;
+            vertical-align: middle;
+        }
+        
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            border-radius: 0.25rem;
+        }
+        
+        .alert {
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+        
+        .list-group-item {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+        }
+        
+        .progress {
+            height: 0.375rem;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        h5 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        h6 {
+            font-size: 0.9rem;
+            margin-bottom: 0.375rem;
+        }
+        
+        .text-muted {
+            font-size: 0.8rem;
+        }
+        
+        .alert-badge {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .alert-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--danger-red);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--veripura-light-blue) 0%, var(--veripura-navy) 100%);
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .hide { display: none; }
+        
+        .click-indicator {
+            font-size: 0.65rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <div class="text-center mb-4">
+                <div class="veripura-logo mx-auto mb-3" style="width: 60px; height: 60px; font-size: 28px;">✓</div>
+                <h1 class="h3 mb-3" style="color: var(--veripura-navy);">
+                    <strong>VeriPura</strong>
+                </h1>
+                <p class="text-muted">Export Compliance Management Platform</p>
+                <div class="alert alert-warning mt-3" style="font-size: 12px;">
+                    <i class="fas fa-lock"></i> <strong>SECURE DEMO:</strong> This is an isolated demonstration environment with simulated data only.
+                </div>
+            </div>
+            
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label">Company</label>
+                    <select class="form-select" id="companySelect" required>
+                        <option value="">Select Company...</option>
+                        <option value="bangkok-food">Bangkok Food Industries Ltd. (Processor)</option>
+                        <option value="eu-gourmet">EU Gourmet Imports B.V. (Importer)</option>
+                        <option value="chonburi-chili">Chonburi Chili Growers Coop (Supplier)</option>
+                        <option value="andaman-fishing">Andaman Fishing Cooperative (Supplier)</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Role</label>
+                    <select class="form-select" id="roleSelect" required>
+                        <option value="">Select Role...</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn w-100" style="background-color: var(--veripura-navy); border-color: var(--veripura-navy); color: white;">
+                    <i class="fas fa-sign-in-alt"></i> Demo Login
+                </button>
+            </form>
+            
+            <div class="text-center mt-3">
+                <small class="text-muted">No password required for demo</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="hide">
+        <!-- Demo Environment Banner -->
+        <div class="demo-banner">
+            <i class="fas fa-shield-alt"></i> 
+            <strong>SECURE DEMO ENVIRONMENT</strong> - This is an isolated sandbox with simulated data only. No real company information is stored or shared.
+        </div>
+        
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#" style="display: flex; align-items: center;">
+                    <div class="veripura-logo">✓</div>
+                    <strong style="color: var(--veripura-navy);">VeriPura</strong>
+                </a>
+                
+                <div class="navbar-nav ms-auto">
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle alert-badge" href="#" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell"></i>
+                            <span class="alert-count" id="alertCount">7</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end" style="width: 300px;">
+                            <h6 class="dropdown-header">Compliance Alerts</h6>
+                            <div class="dropdown-item">
+                                <div class="d-flex">
+                                    <i class="fas fa-exclamation-circle text-danger me-2"></i>
+                                    <div>
+                                        <div class="fw-bold">HACCP Certificate Expired</div>
+                                        <small class="text-muted">PO-001 - Bangkok Food Industries</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle"></i>
+                            <span id="currentUser">Demo User</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item" href="#" onclick="switchRole()">
+                                <i class="fas fa-exchange-alt"></i> Switch Role
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#" onclick="logout()">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Dashboard Content -->
+        <div class="container-fluid mt-4">
+            <!-- Admin Dashboard -->
+            <div id="adminDashboard" class="hide">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h2>
+                        <p class="text-muted">Purchase Order Activity Summary & Role Management</p>
+                    </div>
+                </div>
+                
+                <!-- Metrics Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card card-metric metric-card clickable bg-primary text-white" onclick="showPOOverview()">
+                            <h3>47</h3>
+                            <p class="mb-0">Active Purchase Orders</p>
+                            <small>Across all companies</small>
+                            <div class="click-indicator">
+                                <i class="fas fa-external-link-alt"></i> Click for details
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card card-metric metric-card clickable bg-success text-white" onclick="showComplianceOverview()">
+                            <h3>91%</h3>
+                            <p class="mb-0">Overall Compliance</p>
+                            <small>Target: 95%</small>
+                            <div class="click-indicator">
+                                <i class="fas fa-external-link-alt"></i> Click for breakdown
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card card-metric metric-card clickable bg-warning text-white" onclick="showCriticalAlerts()">
+                            <h3>15</h3>
+                            <p class="mb-0">Critical Alerts</p>
+                            <small>Require attention</small>
+                            <div class="click-indicator">
+                                <i class="fas fa-external-link-alt"></i> Click for alert list
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card card-metric metric-card clickable bg-info text-white" onclick="showSupplierOverview()">
+                            <h3>28</h3>
+                            <p class="mb-0">Active Suppliers</p>
+                            <small>Across supply chain</small>
+                            <div class="click-indicator">
+                                <i class="fas fa-external-link-alt"></i> Click for supplier map
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buyer Dashboard -->
+            <div id="buyerDashboard" class="hide">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h2><i class="fas fa-shopping-cart"></i> Purchase Orders</h2>
+                        <p class="text-muted">Manage your Thai food product orders</p>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button class="btn btn-lg" style="background-color: var(--veripura-navy); border-color: var(--veripura-navy); color: white;" onclick="createNewPO()">
+                            <i class="fas fa-plus-circle"></i> New Purchase Order
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- PO Grid -->
+                <div class="po-grid">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 100px;">PO ID</th>
+                                    <th>Product</th>
+                                    <th>Supplier</th>
+                                    <th style="width: 100px;">Quantity</th>
+                                    <th style="width: 120px;">Due Date</th>
+                                    <th style="width: 120px;">Status</th>
+                                    <th style="width: 120px;">Compliance</th>
+                                    <th style="width: 100px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="po-row" onclick="togglePODetails('po001')">
+                                    <td><strong>PO-001</strong></td>
+                                    <td>Thai Red Curry Paste</td>
+                                    <td>Bangkok Food Industries</td>
+                                    <td>5,000 jars</td>
+                                    <td>2024-09-15</td>
+                                    <td><span class="status-badge status-due-soon">🟡 Due Soon</span></td>
+                                    <td><span class="status-badge status-overdue">🔴 2 Missing</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">View</button>
+                                    </td>
+                                </tr>
+                                <tr id="po001-details" class="hide">
+                                    <td colspan="8">
+                                        <div class="po-details">
+                                            <h6><i class="fas fa-reply"></i> Production Status</h6>
+                                            <div class="row mb-3">
+                                                <div class="col-md-12">
+                                                    <div class="progress mb-2">
+                                                        <div class="progress-bar bg-primary" style="width: 65%"></div>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between small">
+                                                        <span class="text-success">✅ Ingredients Sourced</span>
+                                                        <span class="text-primary">🔄 Production In Progress</span>
+                                                        <span class="text-muted">⏳ Quality Testing</span>
+                                                        <span class="text-muted">📦 Packaging</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p><strong>Current Status:</strong> Production 65% complete | Estimated ready: Sept 14 | Quality control in progress</p>
+                                            
+                                            <div class="mt-3">
+                                                <button class="btn btn-sm btn-info me-2" onclick="requestStatusUpdate('PO-001')">
+                                                    <i class="fas fa-sync"></i> Request Status Update
+                                                </button>
+                                                <button class="btn btn-sm btn-primary" onclick="messageSupplier('PO-001')">
+                                                    <i class="fas fa-envelope"></i> Contact Supplier
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="po-row" onclick="togglePODetails('po002')">
+                                    <td><strong>PO-002</strong></td>
+                                    <td>Thai Sweet Chili Sauce</td>
+                                    <td>Bangkok Food Industries</td>
+                                    <td>10,000 bottles</td>
+                                    <td>2024-09-20</td>
+                                    <td><span class="status-badge status-on-track">🟢 On Track</span></td>
+                                    <td><span class="status-badge status-complete">🟢 Complete</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">View</button>
+                                    </td>
+                                </tr>
+                                <tr id="po002-details" class="hide">
+                                    <td colspan="8">
+                                        <div class="po-details">
+                                            <p>✅ Ready for pickup | ✅ All documents verified | ✅ Quality control passed</p>
+                                            
+                                            <div class="mt-3">
+                                                <button class="btn btn-sm btn-success me-2" onclick="schedulePickup('PO-002')">
+                                                    <i class="fas fa-truck"></i> Schedule Pickup
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QA Manager Dashboard -->
+            <div id="qaDashboard" class="hide">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2><i class="fas fa-microscope"></i> Quality Assurance Dashboard</h2>
+                        <p class="text-muted">Document compliance, testing oversight, and supplier quality management</p>
+                    </div>
+                </div>
+
+                <!-- QA Metrics -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card metric-card text-center">
+                            <div class="card-body">
+                                <h3 class="text-success">84%</h3>
+                                <p class="mb-1">Overall Compliance</p>
+                                <small class="text-muted">Target: 95%</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card metric-card clickable text-center" onclick="showExpiringDocuments()">
+                            <div class="card-body">
+                                <h3 class="text-warning">38</h3>
+                                <p class="mb-0">Documents Expiring</p>
+                                <small class="text-muted">Next 30 days</small>
+                                <div class="click-indicator">
+                                    <i class="fas fa-external-link-alt"></i> Click for details
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card metric-card clickable text-center" onclick="showPendingTests()">
+                            <div class="card-body">
+                                <h3 class="text-info">16</h3>
+                                <p class="mb-0">Pending Test Results</p>
+                                <small class="text-muted">SGS & Internal</small>
+                                <div class="click-indicator">
+                                    <i class="fas fa-external-link-alt"></i> Click for details
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card metric-card clickable text-center" onclick="showNonCompliant()">
+                            <div class="card-body">
+                                <h3 class="text-danger">8</h3>
+                                <p class="mb-0">Non-Compliant</p>
+                                <small class="text-muted">Requires action</small>
+                                <div class="click-indicator">
+                                    <i class="fas fa-external-link-alt"></i> Click for details
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Finance Manager Dashboard -->
+            <div id="financeDashboard" class="hide">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2><i class="fas fa-chart-line"></i> Finance Dashboard</h2>
+                        <p class="text-muted">Payment processing, cost analysis, and financial risk management</p>
+                    </div>
+                </div>
+
+                <!-- Finance Metrics -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card metric-card clickable text-center" onclick="showActivePOValue()">
+                            <div class="card-body">
+                                <h3 class="text-primary">€4.7M</h3>
+                                <p class="mb-0">Active PO Value</p>
+                                <small class="text-muted">47 orders</small>
+                                <div class="click-indicator">
+                                    <i class="fas fa-external-link-alt"></i> Click for breakdown
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card metric-card clickable text-center" onclick="showMonthlyPayments()">
+                            <div class="card-body">
+                                <h3 class="text-success">€2.8M</h3>
+                                <p class="mb-0">Paid This Month</p>
+                                <small class="text-muted">+22% vs last month</small>
+                                <div class="click-indicator">
+                                    <i class="fas fa-external-link-alt"></i> Click for details
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card metric-card clickable text-center" onclick="showCurrencyRisk()">
+                            <div class="card-body">
+                                <h3 class="text-info">€78K</h3>
+                                <p class="mb-0">Currency Risk</p>
+                                <small class="text-muted">THB/EUR exposure</small>
+                                <div class="click-indicator">
+                                    <i class="fas fa-external-link-alt"></i> Click for calculator
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Production Manager Dashboard -->
+            <div id="productionDashboard" class="hide">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2><i class="fas fa-cogs"></i> Production Dashboard</h2>
+                        <p class="text-muted">Recipe management, ingredient coordination, and production scheduling</p>
+                    </div>
+                </div>
+
+                <!-- Production Metrics -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card metric-card clickable text-center" onclick="showActiveBatches()">
+                            <div class="card-body">
+                                <h3 class="text-primary">14</h3>
+                                <p class="mb-0">Active Batches</p>
+                                <small class="text-muted">In production</small>
+                                <div class="click-indicator">
+                                    <i class="fas fa-external-link-alt"></i> Click for details
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card metric-card clickable text-center" onclick="showDeliveryPerformance()">
+                            <div class="card-body">
+                                <h3 class="text-success">91%</h3>
+                                <p class="mb-0">On-Time Delivery</p>
+                                <small class="text-muted">Last 30 days</small>
+                                <div class="click-indicator">
+                                    <i class="fas fa-external-link-alt"></i> Click for analysis
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card metric-card clickable text-center" onclick="showIngredientShortages()">
+                            <div class="card-body">
+                                <h3 class="text-warning">23</h3>
+                                <p class="mb-0">Ingredient Shortages</p>
+                                <small class="text-muted">Requires attention</small>
+                                <div class="click-indicator">
+                                    <i class="fas fa-external-link-alt"></i> Click for details
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card metric-card clickable text-center" onclick="showEquipmentEfficiency()">
+                            <div class="card-body">
+                                <h3 class="text-info">89%</h3>
+                                <p class="mb-0">Equipment Efficiency</p>
+                                <small class="text-muted">This week</small>
+                                <div class="click-indicator">
+                                    <i class="fas fa-external-link-alt"></i> Click for breakdown
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Processor Dashboard -->
+            <div id="processorDashboard" class="hide">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2><i class="fas fa-industry"></i> Procurement Dashboard</h2>
+                        <p class="text-muted">Inventory management, supplier coordination, and procurement oversight</p>
+                    </div>
+                </div>
+
+                <!-- Procurement Metrics -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card metric-card clickable text-center" onclick="showSupplierPerformance()">
+                            <div class="card-body">
+                                <h3 class="text-success">94%</h3>
+                                <p class="mb-0">Supplier Performance</p>
+                                <small class="text-muted">Excellent level</small>
+                                <div class="click-indicator">
+                                    <i class="fas fa-external-link-alt"></i> Click for details
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card metric-card clickable text-center" onclick="showCriticalShortages()">
+                            <div class="card-body">
+                                <h3 class="text-warning">8</h3>
+                                <p class="mb-0">Critical Shortages</p>
+                                <small class="text-muted">Moderate concern</small>
+                                <div class="click-indicator">
+                                    <i class="fas fa-external-link-alt"></i> Click for details
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card metric-card clickable text-center" onclick="showActivePOs()">
+                            <div class="card-body">
+                                <h3 class="text-primary">23</h3>
+                                <p class="mb-0">Active Purchase Orders</p>
+                                <small class="text-muted">Normal volume</small>
+                                <div class="click-indicator">
+                                    <i class="fas fa-external-link-alt"></i> Click for list
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card metric-card clickable text-center" onclick="showLowStockAlerts()">
+                            <div class="card-body">
+                                <h3 class="text-danger">12</h3>
+                                <p class="mb-0">Low Stock Alerts</p>
+                                <small class="text-muted">Requires attention</small>
+                                <div class="click-indicator">
+                                    <i class="fas fa-external-link-alt"></i> Click for alerts
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Processor Content -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6><i class="fas fa-chart-bar"></i> Inventory Status Overview</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="text-center">
+                                            <h4 class="text-success">156</h4>
+                                            <small>Items In Stock</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-center">
+                                            <h4 class="text-info">28</h4>
+                                            <small>Days Avg Supply</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar bg-success" style="width: 70%"></div>
+                                    <div class="progress-bar bg-warning" style="width: 20%"></div>
+                                    <div class="progress-bar bg-danger" style="width: 10%"></div>
+                                </div>
+                                <div class="d-flex justify-content-between small">
+                                    <span class="text-success">Good Stock (70%)</span>
+                                    <span class="text-warning">Low (20%)</span>
+                                    <span class="text-danger">Critical (10%)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6><i class="fas fa-truck"></i> Recent Procurement Activity</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <div class="d-flex justify-content-between">
+                                            <span><strong>Thai Red Chilies</strong></span>
+                                            <span class="badge bg-success">Delivered</span>
+                                        </div>
+                                        <small class="text-muted">Chonburi Chili Coop - 2,500kg</small>
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <div class="d-flex justify-content-between">
+                                            <span><strong>Coconut Milk</strong></span>
+                                            <span class="badge bg-warning">In Transit</span>
+                                        </div>
+                                        <small class="text-muted">Local Supplier - 1,200L</small>
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <div class="d-flex justify-content-between">
+                                            <span><strong>Fish Sauce Base</strong></span>
+                                            <span class="badge bg-info">Ordered</span>
+                                        </div>
+                                        <small class="text-muted">Andaman Fishing - 800L</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logistics Dashboard -->
+            <div id="logisticsDashboard" class="hide">
+                <!-- Farmer/Supplier Logistics -->
+                <div id="farmerLogistics" class="logistics-type hide">
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h2><i class="fas fa-truck"></i> Farm Logistics Dashboard</h2>
+                            <p class="text-muted">Harvest coordination, delivery scheduling, and transport management</p>
+                        </div>
+                    </div>
+
+                    <!-- Farmer Logistics Metrics -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card metric-card clickable text-center" onclick="showReadyForPickup()">
+                                <div class="card-body">
+                                    <h3 class="text-primary">12.5</h3>
+                                    <p class="mb-0">Tons Ready for Pickup</p>
+                                    <small class="text-muted">Fresh chilies & fish</small>
+                                    <div class="click-indicator">
+                                        <i class="fas fa-external-link-alt"></i> Click for breakdown
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card metric-card clickable text-center" onclick="showScheduledDeliveries()">
+                                <div class="card-body">
+                                    <h3 class="text-info">7</h3>
+                                    <p class="mb-0">Scheduled Deliveries</p>
+                                    <small class="text-muted">Next 3 days</small>
+                                    <div class="click-indicator">
+                                        <i class="fas fa-external-link-alt"></i> Click for schedule
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card metric-card clickable text-center" onclick="showFarmDeliveryPerformance()">
+                                <div class="card-body">
+                                    <h3 class="text-success">96%</h3>
+                                    <p class="mb-0">Delivery Success Rate</p>
+                                    <small class="text-muted">Last 30 days</small>
+                                    <div class="click-indicator">
+                                        <i class="fas fa-external-link-alt"></i> Click for analysis
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Farm Logistics Content -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-calendar-alt"></i> Today's Pickup Schedule</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group list-group-flush">
+                                        <div class="list-group-item px-0">
+                                            <div class="d-flex justify-content-between">
+                                                <span><strong>Bangkok Food Industries</strong></span>
+                                                <span class="badge bg-success">08:30</span>
+                                            </div>
+                                            <small class="text-muted">Red chilies - 3.2 tons</small>
+                                        </div>
+                                        <div class="list-group-item px-0">
+                                            <div class="d-flex justify-content-between">
+                                                <span><strong>Bangkok Food Industries</strong></span>
+                                                <span class="badge bg-warning">14:00</span>
+                                            </div>
+                                            <small class="text-muted">Fish sauce base - 1.8 tons</small>
+                                        </div>
+                                        <div class="list-group-item px-0">
+                                            <div class="d-flex justify-content-between">
+                                                <span><strong>Local Processor</strong></span>
+                                                <span class="badge bg-info">16:30</span>
+                                            </div>
+                                            <small class="text-muted">Green chilies - 2.1 tons</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-seedling"></i> Harvest Status</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span><strong>Red Chilies</strong></span>
+                                            <span>5.3 tons ready</span>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-success" style="width: 85%"></div>
+                                        </div>
+                                        <small class="text-muted">Field A & B harvested</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span><strong>Fish Catch</strong></span>
+                                            <span>4.2 tons fresh</span>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-info" style="width: 70%"></div>
+                                        </div>
+                                        <small class="text-muted">Morning fleet returned</small>
+                                    </div>
+                                    <div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span><strong>Green Chilies</strong></span>
+                                            <span>3.0 tons ready</span>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-warning" style="width: 60%"></div>
+                                        </div>
+                                        <small class="text-muted">Harvesting in progress</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Processor Logistics -->
+                <div id="processorLogistics" class="logistics-type hide">
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h2><i class="fas fa-ship"></i> Export Logistics Dashboard</h2>
+                            <p class="text-muted">International shipping, customs documentation, and export compliance management</p>
+                        </div>
+                    </div>
+
+                    <!-- Processor Logistics Metrics -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card metric-card clickable text-center" onclick="showExportShipments()">
+                                <div class="card-body">
+                                    <h3 class="text-primary">18</h3>
+                                    <p class="mb-0">Export Shipments Ready</p>
+                                    <small class="text-muted">Awaiting dispatch</small>
+                                    <div class="click-indicator">
+                                        <i class="fas fa-external-link-alt"></i> Click for details
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card metric-card clickable text-center" onclick="showExportDocumentation()">
+                                <div class="card-body">
+                                    <h3 class="text-success">94%</h3>
+                                    <p class="mb-0">Documentation Complete</p>
+                                    <small class="text-muted">Customs ready</small>
+                                    <div class="click-indicator">
+                                        <i class="fas fa-external-link-alt"></i> Click for status
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card metric-card clickable text-center" onclick="showExportCompliance()">
+                                <div class="card-body">
+                                    <h3 class="text-success">98%</h3>
+                                    <p class="mb-0">Export Compliance Score</p>
+                                    <small class="text-muted">Excellent rating</small>
+                                    <div class="click-indicator">
+                                        <i class="fas fa-external-link-alt"></i> Click for breakdown
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card metric-card clickable text-center" onclick="showFreightCosts()">
+                                <div class="card-body">
+                                    <h3 class="text-warning">€87K</h3>
+                                    <p class="mb-0">Monthly Freight Cost</p>
+                                    <small class="text-muted">+8% vs target</small>
+                                    <div class="click-indicator">
+                                        <i class="fas fa-external-link-alt"></i> Click for analysis
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Processor Logistics Content -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-container-storage"></i> Containers Waiting Departure</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group list-group-flush">
+                                        <div class="list-group-item px-0">
+                                            <div class="d-flex justify-content-between">
+                                                <span><strong>CONT-TH-2024-145</strong></span>
+                                                <span class="badge bg-success">Ready</span>
+                                            </div>
+                                            <small class="text-muted">EU Gourmet Imports - 28 pallets</small>
+                                        </div>
+                                        <div class="list-group-item px-0">
+                                            <div class="d-flex justify-content-between">
+                                                <span><strong>CONT-TH-2024-146</strong></span>
+                                                <span class="badge bg-warning">Customs</span>
+                                            </div>
+                                            <small class="text-muted">German Distributor - 32 pallets</small>
+                                        </div>
+                                        <div class="list-group-item px-0">
+                                            <div class="d-flex justify-content-between">
+                                                <span><strong>CONT-TH-2024-147</strong></span>
+                                                <span class="badge bg-info">Loading</span>
+                                            </div>
+                                            <small class="text-muted">French Importer - 25 pallets</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-file-export"></i> Export Documentation Status</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span><strong>Health Certificates</strong></span>
+                                            <span>17/18 Complete</span>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-success" style="width: 94%"></div>
+                                        </div>
+                                        <small class="text-muted">1 pending EU authority approval</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span><strong>Commercial Invoices</strong></span>
+                                            <span>18/18 Complete</span>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-success" style="width: 100%"></div>
+                                        </div>
+                                        <small class="text-muted">All invoices processed</small>
+                                    </div>
+                                    <div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span><strong>Customs Declarations</strong></span>
+                                            <span>16/18 Complete</span>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-warning" style="width: 89%"></div>
+                                        </div>
+                                        <small class="text-muted">2 awaiting customs approval</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Importer Logistics -->
+                <div id="importerLogistics" class="logistics-type hide">
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h2><i class="fas fa-warehouse"></i> Import Logistics Dashboard</h2>
+                            <p class="text-muted">Customs clearance, import compliance, and distribution management</p>
+                        </div>
+                    </div>
+
+                    <!-- Importer Logistics Metrics -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card metric-card clickable text-center" onclick="showIncomingContainers()">
+                                <div class="card-body">
+                                    <h3 class="text-info">9</h3>
+                                    <p class="mb-0">Containers Arriving</p>
+                                    <small class="text-muted">Next 7 days</small>
+                                    <div class="click-indicator">
+                                        <i class="fas fa-external-link-alt"></i> Click for schedule
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card metric-card clickable text-center" onclick="showCustomsClearance()">
+                                <div class="card-body">
+                                    <h3 class="text-warning">5</h3>
+                                    <p class="mb-0">Awaiting Customs Clearance</p>
+                                    <small class="text-muted">In queue</small>
+                                    <div class="click-indicator">
+                                        <i class="fas fa-external-link-alt"></i> Click for details
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card metric-card clickable text-center" onclick="showImportCompliance()">
+                                <div class="card-body">
+                                    <h3 class="text-success">97%</h3>
+                                    <p class="mb-0">Import Compliance Score</p>
+                                    <small class="text-muted">Excellent rating</small>
+                                    <div class="click-indicator">
+                                        <i class="fas fa-external-link-alt"></i> Click for breakdown
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card metric-card clickable text-center" onclick="showClearanceTime()">
+                                <div class="card-body">
+                                    <h3 class="text-primary">2.4</h3>
+                                    <p class="mb-0">Average Clearance Time</p>
+                                    <small class="text-muted">Days (Target: 2.0)</small>
+                                    <div class="click-indicator">
+                                        <i class="fas fa-external-link-alt"></i> Click for trends
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Importer Logistics Content -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-ship"></i> Incoming Shipments Status</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group list-group-flush">
+                                        <div class="list-group-item px-0">
+                                            <div class="d-flex justify-content-between">
+                                                <span><strong>CONT-TH-2024-145</strong></span>
+                                                <span class="badge bg-success">Cleared</span>
+                                            </div>
+                                            <small class="text-muted">Thai curry products - Arrives: Aug 16</small>
+                                        </div>
+                                        <div class="list-group-item px-0">
+                                            <div class="d-flex justify-content-between">
+                                                <span><strong>CONT-TH-2024-146</strong></span>
+                                                <span class="badge bg-warning">Customs</span>
+                                            </div>
+                                            <small class="text-muted">Chili sauces - Arrives: Aug 17</small>
+                                        </div>
+                                        <div class="list-group-item px-0">
+                                            <div class="d-flex justify-content-between">
+                                                <span><strong>CONT-TH-2024-147</strong></span>
+                                                <span class="badge bg-info">In Transit</span>
+                                            </div>
+                                            <small class="text-muted">Fish sauce products - Arrives: Aug 19</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-file-import"></i> EU Customs Status</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span><strong>EU Health Certificates</strong></span>
+                                            <span>8/9 Verified</span>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-success" style="width: 89%"></div>
+                                        </div>
+                                        <small class="text-muted">1 awaiting final verification</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span><strong>Import Declarations</strong></span>
+                                            <span>7/9 Processed</span>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-warning" style="width: 78%"></div>
+                                        </div>
+                                        <small class="text-muted">2 pending customs review</small>
+                                    </div>
+                                    <div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span><strong>Duty & VAT Payments</strong></span>
+                                            <span>9/9 Complete</span>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-success" style="width: 100%"></div>
+                                        </div>
+                                        <small class="text-muted">All payments processed</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Supplier Dashboard -->
+            <div id="supplierDashboard" class="hide">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2><i class="fas fa-leaf"></i> Supplier Operations Dashboard</h2>
+                        <p class="text-muted">Production management, sales performance, and delivery coordination</p>
+                    </div>
+                </div>
+
+                <!-- Supplier Metrics -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card metric-card clickable text-center" onclick="showHarvestVolume()">
+                            <div class="card-body">
+                                <h3 class="text-success">145</h3>
+                                <p class="mb-0">Tons Harvested This Month</p>
+                                <small class="text-muted">+18% vs last month</small>
+                                <div class="click-indicator">
+                                    <i class="fas fa-external-link-alt"></i> Click for breakdown
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card metric-card clickable text-center" onclick="showMonthlyRevenue()">
+                            <div class="card-body">
+                                <h3 class="text-primary">€284K</h3>
+                                <p class="mb-0">Monthly Revenue</p>
+                                <small class="text-muted">12 active customers</small>
+                                <div class="click-indicator">
+                                    <i class="fas fa-external-link-alt"></i> Click for details
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card metric-card clickable text-center" onclick="showOrderFulfillment()">
+                            <div class="card-body">
+                                <h3 class="text-success">96%</h3>
+                                <p class="mb-0">Order Fulfillment Rate</p>
+                                <small class="text-muted">On-time delivery</small>
+                                <div class="click-indicator">
+                                    <i class="fas fa-external-link-alt"></i> Click for performance
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Supplier Content -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6><i class="fas fa-chart-line"></i> Production Overview</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span><strong>Red Chilies</strong></span>
+                                        <span>68 tons</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-danger" style="width: 47%"></div>
+                                    </div>
+                                    <small class="text-muted">47% of monthly production</small>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span><strong>Green Chilies</strong></span>
+                                        <span>42 tons</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" style="width: 29%"></div>
+                                    </div>
+                                    <small class="text-muted">29% of monthly production</small>
+                                </div>
+                                <div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span><strong>Fresh Fish</strong></span>
+                                        <span>35 tons</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-info" style="width: 24%"></div>
+                                    </div>
+                                    <small class="text-muted">24% of monthly production</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6><i class="fas fa-handshake"></i> Customer Performance</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <div class="d-flex justify-content-between">
+                                            <span><strong>Bangkok Food Industries</strong></span>
+                                            <span class="badge bg-success">€156K</span>
+                                        </div>
+                                        <small class="text-muted">55% of revenue - 8 orders this month</small>
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <div class="d-flex justify-content-between">
+                                            <span><strong>Local Food Processors</strong></span>
+                                            <span class="badge bg-info">€78K</span>
+                                        </div>
+                                        <small class="text-muted">27% of revenue - 12 orders this month</small>
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <div class="d-flex justify-content-between">
+                                            <span><strong>Regional Distributors</strong></span>
+                                            <span class="badge bg-warning">€35K</span>
+                                        </div>
+                                        <small class="text-muted">12% of revenue - 6 orders this month</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for manager details -->
+    <div class="modal fade" id="managerDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="managerDetailTitle">Detail View</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="managerDetailContent">
+                        <!-- Content will be loaded dynamically -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pickup Schedule Modal -->
+    <div class="modal fade" id="pickupModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-truck"></i> Schedule Pickup</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Pickup scheduling options would be displayed here.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" onclick="confirmPickup()">
+                        <i class="fas fa-check"></i> Confirm Pickup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Application State
+        let currentUser = null;
+        let currentCompany = null;
+        let currentRole = null;
+
+        // Company-Role mappings
+        const companyRoles = {
+            'bangkok-food': ['Manager', 'Production Manager', 'Procurement Manager', 'Logistics Coordinator', 'QA Manager'],
+            'eu-gourmet': ['Manager', 'Buyer', 'QA Manager', 'Logistics Manager', 'Finance Manager', 'Customs Broker', 'Inspector'],
+            'chonburi-chili': ['Admin', 'Quality Control', 'Sales Manager', 'Farm Manager'],
+            'andaman-fishing': ['Admin', 'Quality Control', 'Sales Manager', 'Boat Captain']
+        };
+
+        // Role-Dashboard mappings
+        const roleDashboards = {
+            'Manager': 'adminDashboard',
+            'Buyer': 'buyerDashboard',
+            'Production Manager': 'productionDashboard',
+            'Procurement Manager': 'processorDashboard',
+            'Logistics Manager': 'logisticsDashboard',
+            'Logistics Coordinator': 'logisticsDashboard',
+            'QA Manager': 'qaDashboard',
+            'Finance Manager': 'financeDashboard',
+            'Admin': 'supplierDashboard',
+            'Quality Control': 'supplierDashboard',
+            'Sales Manager': 'supplierDashboard',
+            'Farm Manager': 'supplierDashboard',
+            'Boat Captain': 'supplierDashboard',
+            'Customs Broker': 'buyerDashboard',
+            'Inspector': 'buyerDashboard'
+        };
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('VeriPura platform loaded successfully');
+            
+            const companySelect = document.getElementById('companySelect');
+            const loginForm = document.getElementById('loginForm');
+            
+            if (companySelect) {
+                companySelect.addEventListener('change', updateRoles);
+            }
+            
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
+        });
+
+        function updateRoles() {
+            const company = document.getElementById('companySelect').value;
+            const roleSelect = document.getElementById('roleSelect');
+            
+            // Clear existing options
+            roleSelect.innerHTML = '<option value="">Select Role...</option>';
+            
+            // Add roles for selected company
+            if (company && companyRoles[company]) {
+                companyRoles[company].forEach(role => {
+                    const option = document.createElement('option');
+                    option.value = role.toLowerCase().replace(/\s+/g, '-');
+                    option.textContent = role;
+                    roleSelect.appendChild(option);
+                });
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const company = document.getElementById('companySelect').value;
+            const role = document.getElementById('roleSelect').value;
+            
+            if (!company || !role) {
+                alert('Please select both company and role');
+                return;
+            }
+
+            currentCompany = company;
+            currentRole = role;
+            
+            const companyText = document.getElementById('companySelect').options[document.getElementById('companySelect').selectedIndex].text.split(' (')[0];
+            const roleText = companyRoles[company].find(r => r.toLowerCase().replace(/\s+/g, '-') === role);
+            document.getElementById('currentUser').textContent = roleText + ' - ' + companyText;
+
+            showDashboard(role);
+            
+            document.getElementById('loginScreen').classList.add('hide');
+            document.getElementById('mainApp').classList.remove('hide');
+        }
+
+        function showDashboard(role) {
+            // Hide all dashboards
+            document.querySelectorAll('[id$="Dashboard"]').forEach(dashboard => {
+                dashboard.classList.add('hide');
+            });
+            
+            const roleText = companyRoles[currentCompany].find(r => r.toLowerCase().replace(/\s+/g, '-') === role);
+            const dashboardId = roleDashboards[roleText];
+            if (dashboardId) {
+                document.getElementById(dashboardId).classList.remove('hide');
+                
+                // Handle logistics dashboard variations by company type
+                if (dashboardId === 'logisticsDashboard') {
+                    showAppropriateLogistics();
+                }
+            }
+        }
+
+        function showAppropriateLogistics() {
+            // Hide all logistics types first
+            document.querySelectorAll('.logistics-type').forEach(type => {
+                type.classList.add('hide');
+            });
+            
+            // Show appropriate logistics based on company
+            if (currentCompany === 'chonburi-chili' || currentCompany === 'andaman-fishing') {
+                // Farmer/Supplier logistics
+                document.getElementById('farmerLogistics').classList.remove('hide');
+            } else if (currentCompany === 'bangkok-food') {
+                // Processor logistics
+                document.getElementById('processorLogistics').classList.remove('hide');
+            } else if (currentCompany === 'eu-gourmet') {
+                // Importer logistics
+                const importerLogistics = document.getElementById('importerLogistics');
+                if (importerLogistics) {
+                    importerLogistics.classList.remove('hide');
+                }
+            }
+        }
+
+        function switchRole() {
+            document.getElementById('mainApp').classList.add('hide');
+            document.getElementById('loginScreen').classList.remove('hide');
+        }
+
+        function logout() {
+            currentUser = null;
+            currentCompany = null;
+            currentRole = null;
+            document.getElementById('companySelect').value = '';
+            document.getElementById('roleSelect').innerHTML = '<option value="">Select Role...</option>';
+            document.getElementById('mainApp').classList.add('hide');
+            document.getElementById('loginScreen').classList.remove('hide');
+        }
+
+        // Purchase Order Functions
+        function togglePODetails(poId) {
+            const detailsRow = document.getElementById(poId + '-details');
+            const parentRow = detailsRow.previousElementSibling;
+            
+            if (detailsRow.classList.contains('hide')) {
+                detailsRow.classList.remove('hide');
+                parentRow.classList.add('expanded');
+            } else {
+                detailsRow.classList.add('hide');
+                parentRow.classList.remove('expanded');
+            }
+        }
+
+        function createNewPO() {
+            alert('New Purchase Order creation wizard would open here.');
+        }
+
+        function requestStatusUpdate(poId) {
+            alert('Status Update Request Sent for ' + poId);
+        }
+
+        function messageSupplier(poId) {
+            const message = prompt('Message to supplier:');
+            if (message) {
+                alert('Message sent to supplier for ' + poId + ': "' + message + '"');
+            }
+        }
+
+        function schedulePickup(poId) {
+            new bootstrap.Modal(document.getElementById('pickupModal')).show();
+        }
+
+        function confirmPickup() {
+            alert('Pickup Scheduled Successfully!');
+            bootstrap.Modal.getInstance(document.getElementById('pickupModal')).hide();
+        }
+
+        // Currency Calculator Function
+        function calculateImpact() {
+            const currentRate = 38.5;
+            const newRate = parseFloat(document.getElementById('newRate').value) || currentRate;
+            const thbAmount = 3010000;
+            
+            const currentEurValue = thbAmount / currentRate;
+            const newEurValue = thbAmount / newRate;
+            const impact = newEurValue - currentEurValue;
+            const rateChangePercent = ((newRate - currentRate) / currentRate * 100);
+            
+            document.getElementById('rateChange').textContent = rateChangePercent.toFixed(2) + '%';
+            document.getElementById('impact').textContent = (impact >= 0 ? '+' : '') + '€' + Math.abs(impact).toLocaleString('en-US', {maximumFractionDigits: 0});
+            document.getElementById('impact').className = 'form-control-plaintext ' + (impact >= 0 ? 'text-success' : 'text-danger');
+            document.getElementById('newValue').textContent = '€' + newEurValue.toLocaleString('en-US', {maximumFractionDigits: 0});
+        }
+
+        // Admin Dashboard Functions
+        function showPOOverview() {
+            document.getElementById('managerDetailTitle').textContent = 'Purchase Orders Overview';
+            document.getElementById('managerDetailContent').innerHTML = '<h6>Purchase Orders Overview</h6><p>Detailed PO information would be displayed here.</p>';
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showComplianceOverview() {
+            document.getElementById('managerDetailTitle').textContent = 'Compliance Overview';
+            document.getElementById('managerDetailContent').innerHTML = '<h6>Compliance Overview</h6><p>Detailed compliance information would be displayed here.</p>';
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showCriticalAlerts() {
+            document.getElementById('managerDetailTitle').textContent = 'Critical Alerts';
+            document.getElementById('managerDetailContent').innerHTML = '<h6>Critical Alerts</h6><p>Detailed alert information would be displayed here.</p>';
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showSupplierOverview() {
+            document.getElementById('managerDetailTitle').textContent = 'Supplier Overview';
+            document.getElementById('managerDetailContent').innerHTML = '<h6>Supplier Overview</h6><p>Detailed supplier information would be displayed here.</p>';
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        // QA Manager Dashboard Functions
+        function showExpiringDocuments() {
+            document.getElementById('managerDetailTitle').textContent = 'Documents Expiring (Next 30 Days)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card border-danger mb-3">
+                            <div class="card-header bg-danger text-white">
+                                <h6 class="mb-0"><i class="fas fa-exclamation-triangle"></i> URGENT (1-7 days)</h6>
+                            </div>
+                            <div class="card-body p-2">
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item p-2">
+                                        <strong>HACCP Certificate</strong><br>
+                                        <small>Bangkok Food Industries - Expires: Aug 16</small>
+                                    </div>
+                                    <div class="list-group-item p-2">
+                                        <strong>FDA Registration</strong><br>
+                                        <small>Chonburi Chili Coop - Expires: Aug 19</small>
+                                    </div>
+                                    <div class="list-group-item p-2">
+                                        <strong>Organic Certificate</strong><br>
+                                        <small>Andaman Fishing - Expires: Aug 21</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-warning mb-3">
+                            <div class="card-header bg-warning text-dark">
+                                <h6 class="mb-0"><i class="fas fa-clock"></i> HIGH PRIORITY (8-14 days)</h6>
+                            </div>
+                            <div class="card-body p-2">
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item p-2">
+                                        <strong>BRC Certificate</strong><br>
+                                        <small>Bangkok Food Industries - Expires: Aug 28</small>
+                                    </div>
+                                    <div class="list-group-item p-2">
+                                        <strong>Halal Certificate</strong><br>
+                                        <small>Bangkok Food Industries - Expires: Sep 2</small>
+                                    </div>
+                                    <div class="list-group-item p-2">
+                                        <strong>Export License</strong><br>
+                                        <small>Chonburi Chili Coop - Expires: Sep 5</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-info mb-3">
+                            <div class="card-header bg-info text-white">
+                                <h6 class="mb-0"><i class="fas fa-calendar"></i> MEDIUM PRIORITY (15-30 days)</h6>
+                            </div>
+                            <div class="card-body p-2">
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item p-2">
+                                        <strong>ISO 22000</strong><br>
+                                        <small>Bangkok Food Industries - Expires: Sep 12</small>
+                                    </div>
+                                    <div class="list-group-item p-2">
+                                        <strong>Health Certificate</strong><br>
+                                        <small>Multiple Suppliers - Expires: Sep 15</small>
+                                    </div>
+                                    <div class="list-group-item p-2">
+                                        <strong>Lab Accreditation</strong><br>
+                                        <small>SGS Thailand - Expires: Sep 18</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showPendingTests() {
+            document.getElementById('managerDetailTitle').textContent = 'Pending Test Results (16 Total)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Sample ID</th>
+                                <th>Test Type</th>
+                                <th>Product</th>
+                                <th>Expected Date</th>
+                                <th>Lab</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>S-2024-001</strong></td>
+                                <td>Microbiological Testing</td>
+                                <td>Thai Red Curry Paste</td>
+                                <td>Aug 16, 2025</td>
+                                <td>Internal Lab</td>
+                                <td><span class="badge bg-warning">Processing</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>S-2024-002</strong></td>
+                                <td>Heavy Metals Analysis</td>
+                                <td>Sweet Chili Sauce</td>
+                                <td>Aug 17, 2025</td>
+                                <td>Internal Lab</td>
+                                <td><span class="badge bg-info">Received</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>SGS-TH-445</strong></td>
+                                <td>Pesticide Residue</td>
+                                <td>Chili Peppers</td>
+                                <td>Aug 18, 2025</td>
+                                <td>SGS Thailand</td>
+                                <td><span class="badge bg-warning">Testing</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>SGS-TH-446</strong></td>
+                                <td>Nutritional Analysis</td>
+                                <td>Fish Sauce</td>
+                                <td>Aug 19, 2025</td>
+                                <td>SGS Thailand</td>
+                                <td><span class="badge bg-info">Queued</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>S-2024-003</strong></td>
+                                <td>Allergen Testing</td>
+                                <td>Coconut Milk</td>
+                                <td>Aug 20, 2025</td>
+                                <td>Internal Lab</td>
+                                <td><span class="badge bg-warning">Processing</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">
+                                    <em>+ 11 more pending tests...</em>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showNonCompliant() {
+            document.getElementById('managerDetailTitle').textContent = 'Non-Compliant Items (8 Total)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <div class="accordion" id="nonCompliantAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#item1">
+                                <span class="badge bg-danger me-2">HIGH</span>
+                                <strong>HACCP Certificate Expired - Bangkok Food Industries</strong>
+                            </button>
+                        </h2>
+                        <div id="item1" class="accordion-collapse collapse" data-bs-parent="#nonCompliantAccordion">
+                            <div class="accordion-body">
+                                <p><strong>Issue:</strong> HACCP certification expired on Aug 10, 2025</p>
+                                <p><strong>Required Action:</strong> Renewal application submitted, awaiting audit scheduling</p>
+                                <p><strong>Responsible Party:</strong> QA Manager - Somchai Patel (Bangkok Food)</p>
+                                <p><strong>Due Date:</strong> Aug 25, 2025</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#item2">
+                                <span class="badge bg-danger me-2">HIGH</span>
+                                <strong>Failed Microbiological Test - PO-001</strong>
+                            </button>
+                        </h2>
+                        <div id="item2" class="accordion-collapse collapse" data-bs-parent="#nonCompliantAccordion">
+                            <div class="accordion-body">
+                                <p><strong>Issue:</strong> E.coli detected above acceptable limits in curry paste sample</p>
+                                <p><strong>Required Action:</strong> Batch quarantine, root cause analysis, corrective measures</p>
+                                <p><strong>Responsible Party:</strong> Production Manager - Niran Thaksin (Bangkok Food)</p>
+                                <p><strong>Due Date:</strong> Aug 16, 2025</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#item3">
+                                <span class="badge bg-warning me-2">MED</span>
+                                <strong>Missing Organic Certification - Chonburi Chili</strong>
+                            </button>
+                        </h2>
+                        <div id="item3" class="accordion-collapse collapse" data-bs-parent="#nonCompliantAccordion">
+                            <div class="accordion-body">
+                                <p><strong>Issue:</strong> Organic certification documentation not provided for new chili variety</p>
+                                <p><strong>Required Action:</strong> Obtain organic certification or reclassify product as conventional</p>
+                                <p><strong>Responsible Party:</strong> Farm Manager - Apinya Surat (Chonburi Chili)</p>
+                                <p><strong>Due Date:</strong> Aug 30, 2025</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#item4">
+                                <span class="badge bg-warning me-2">MED</span>
+                                <strong>Incomplete Traceability Records - Andaman Fishing</strong>
+                            </button>
+                        </h2>
+                        <div id="item4" class="accordion-collapse collapse" data-bs-parent="#nonCompliantAccordion">
+                            <div class="accordion-body">
+                                <p><strong>Issue:</strong> Missing boat captain logs for 3 fishing trips in July</p>
+                                <p><strong>Required Action:</strong> Retrieve missing logs or provide alternative documentation</p>
+                                <p><strong>Responsible Party:</strong> Boat Captain - Manop Krabi (Andaman Fishing)</p>
+                                <p><strong>Due Date:</strong> Aug 20, 2025</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#more">
+                                <span class="text-muted">+ 4 more non-compliant items...</span>
+                            </button>
+                        </h2>
+                    </div>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        // Finance Manager Dashboard Functions
+        function showActivePOValue() {
+            document.getElementById('managerDetailTitle').textContent = 'Active Purchase Orders - €4.7M Total Value';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <div class="accordion" id="supplierPOAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#supplier1">
+                                <strong>Bangkok Food Industries - €2.8M (18 orders)</strong>
+                            </button>
+                        </h2>
+                        <div id="supplier1" class="accordion-collapse collapse show" data-bs-parent="#supplierPOAccordion">
+                            <div class="accordion-body">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr><th>PO ID</th><th>Product</th><th>Value</th><th>Due Date</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>PO-001</td><td>Thai Red Curry Paste</td><td>€285,000</td><td>Sep 15</td></tr>
+                                        <tr><td>PO-002</td><td>Sweet Chili Sauce</td><td>€425,000</td><td>Sep 20</td></tr>
+                                        <tr><td>PO-007</td><td>Green Curry Paste</td><td>€320,000</td><td>Sep 25</td></tr>
+                                        <tr><td>PO-012</td><td>Pad Thai Sauce</td><td>€180,000</td><td>Oct 5</td></tr>
+                                        <tr><td colspan="4" class="text-center text-muted"><em>+ 14 more orders...</em></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#supplier2">
+                                <strong>Chonburi Chili Growers Coop - €1.2M (15 orders)</strong>
+                            </button>
+                        </h2>
+                        <div id="supplier2" class="accordion-collapse collapse" data-bs-parent="#supplierPOAccordion">
+                            <div class="accordion-body">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr><th>PO ID</th><th>Product</th><th>Value</th><th>Due Date</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>PO-003</td><td>Fresh Red Chilies</td><td>€95,000</td><td>Aug 18</td></tr>
+                                        <tr><td>PO-008</td><td>Dried Chili Flakes</td><td>€125,000</td><td>Aug 25</td></tr>
+                                        <tr><td>PO-014</td><td>Chili Powder</td><td>€85,000</td><td>Sep 2</td></tr>
+                                        <tr><td colspan="4" class="text-center text-muted"><em>+ 12 more orders...</em></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#supplier3">
+                                <strong>Andaman Fishing Cooperative - €700K (14 orders)</strong>
+                            </button>
+                        </h2>
+                        <div id="supplier3" class="accordion-collapse collapse" data-bs-parent="#supplierPOAccordion">
+                            <div class="accordion-body">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr><th>PO ID</th><th>Product</th><th>Value</th><th>Due Date</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>PO-005</td><td>Premium Fish Sauce</td><td>€165,000</td><td>Aug 30</td></tr>
+                                        <tr><td>PO-009</td><td>Anchovy Paste</td><td>€85,000</td><td>Sep 8</td></tr>
+                                        <tr><td>PO-016</td><td>Fish Stock Base</td><td>€120,000</td><td>Sep 12</td></tr>
+                                        <tr><td colspan="4" class="text-center text-muted"><em>+ 11 more orders...</em></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showMonthlyPayments() {
+            document.getElementById('managerDetailTitle').textContent = 'Monthly Payments Comparison';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-header"><strong>August 2025 - €2.8M</strong></div>
+                            <div class="card-body">
+                                <table class="table table-sm mb-0">
+                                    <tr><td>Bangkok Food Industries</td><td class="text-end">€1.6M</td></tr>
+                                    <tr><td>Chonburi Chili Coop</td><td class="text-end">€685K</td></tr>
+                                    <tr><td>Andaman Fishing</td><td class="text-end">€385K</td></tr>
+                                    <tr><td>Other Suppliers</td><td class="text-end">€130K</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header"><strong>July 2025 - €2.3M</strong></div>
+                            <div class="card-body">
+                                <table class="table table-sm mb-0">
+                                    <tr><td>Bangkok Food Industries</td><td class="text-end">€1.2M</td></tr>
+                                    <tr><td>Chonburi Chili Coop</td><td class="text-end">€580K</td></tr>
+                                    <tr><td>Andaman Fishing</td><td class="text-end">€320K</td></tr>
+                                    <tr><td>Other Suppliers</td><td class="text-end">€200K</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-success">
+                    <h6><i class="fas fa-chart-line"></i> Month-over-Month Analysis</h6>
+                    <p class="mb-1"><strong>Total Increase:</strong> €500K (+22%)</p>
+                    <p class="mb-1"><strong>Largest Growth:</strong> Bangkok Food Industries (+€400K, +33%)</p>
+                    <p class="mb-0"><strong>Payment Efficiency:</strong> 95% on-time payments vs 89% last month</p>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showCurrencyRisk() {
+            document.getElementById('managerDetailTitle').textContent = 'Currency Risk Calculator - THB/EUR';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header"><strong>Current Exposure</strong></div>
+                            <div class="card-body">
+                                <p><strong>Current Rate:</strong> 1 EUR = 38.5 THB</p>
+                                <p><strong>Total THB Exposure:</strong> ฿3,010,000</p>
+                                <p><strong>EUR Equivalent:</strong> €78,182</p>
+                                <p><strong>Outstanding POs:</strong> 23 orders</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border-warning">
+                            <div class="card-header bg-warning"><strong>Impact Calculator</strong></div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">New Exchange Rate (THB per EUR):</label>
+                                    <input type="number" class="form-control" id="newRate" value="38.5" step="0.1" onchange="calculateImpact()">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Rate Change:</label>
+                                    <div id="rateChange" class="form-control-plaintext">0%</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Financial Impact:</label>
+                                    <div id="impact" class="form-control-plaintext text-success">€0</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">New EUR Value:</label>
+                                    <div id="newValue" class="form-control-plaintext">€78,182</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        // Production Manager Dashboard Functions
+        function showActiveBatches() {
+            document.getElementById('managerDetailTitle').textContent = 'Active Production Batches (14 Total)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Batch ID</th>
+                                <th>Product</th>
+                                <th>Status</th>
+                                <th>Progress</th>
+                                <th>Est. Completion</th>
+                                <th>PO Reference</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>B-2024-087</strong></td>
+                                <td>Thai Red Curry Paste</td>
+                                <td><span class="badge bg-warning">Mixing</span></td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar bg-primary" style="width: 65%">65%</div>
+                                    </div>
+                                </td>
+                                <td>Aug 16, 14:30</td>
+                                <td>PO-001</td>
+                            </tr>
+                            <tr>
+                                <td><strong>B-2024-088</strong></td>
+                                <td>Sweet Chili Sauce</td>
+                                <td><span class="badge bg-success">QC Testing</span></td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar bg-success" style="width: 90%">90%</div>
+                                    </div>
+                                </td>
+                                <td>Aug 15, 16:00</td>
+                                <td>PO-002</td>
+                            </tr>
+                            <tr>
+                                <td><strong>B-2024-089</strong></td>
+                                <td>Green Curry Paste</td>
+                                <td><span class="badge bg-info">Grinding</span></td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar bg-info" style="width: 45%">45%</div>
+                                    </div>
+                                </td>
+                                <td>Aug 17, 10:00</td>
+                                <td>PO-007</td>
+                            </tr>
+                            <tr>
+                                <td><strong>B-2024-090</strong></td>
+                                <td>Pad Thai Sauce</td>
+                                <td><span class="badge bg-warning">Cooking</span></td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar bg-warning" style="width: 30%">30%</div>
+                                    </div>
+                                </td>
+                                <td>Aug 18, 12:00</td>
+                                <td>PO-012</td>
+                            </tr>
+                            <tr>
+                                <td><strong>B-2024-091</strong></td>
+                                <td>Fish Sauce Premium</td>
+                                <td><span class="badge bg-secondary">Fermenting</span></td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar bg-secondary" style="width: 15%">15%</div>
+                                    </div>
+                                </td>
+                                <td>Aug 25, 09:00</td>
+                                <td>PO-005</td>
+                            </tr>
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">
+                                    <em>+ 9 more active batches...</em>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showDeliveryPerformance() {
+            document.getElementById('managerDetailTitle').textContent = 'On-Time Delivery Performance Analysis';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <div class="row mb-4">
+                    <div class="col-md-8">
+                        <h6>Recent Deliveries (Last 30 Days)</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>PO ID</th>
+                                        <th>Product</th>
+                                        <th>Due Date</th>
+                                        <th>Delivered</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="table-success">
+                                        <td>PO-002</td>
+                                        <td>Sweet Chili Sauce</td>
+                                        <td>Aug 12</td>
+                                        <td>Aug 11</td>
+                                        <td><span class="badge bg-success">Early</span></td>
+                                    </tr>
+                                    <tr class="table-success">
+                                        <td>PO-006</td>
+                                        <td>Coconut Milk</td>
+                                        <td>Aug 10</td>
+                                        <td>Aug 10</td>
+                                        <td><span class="badge bg-success">On Time</span></td>
+                                    </tr>
+                                    <tr class="table-danger">
+                                        <td>PO-008</td>
+                                        <td>Chili Flakes</td>
+                                        <td>Aug 8</td>
+                                        <td>Aug 10</td>
+                                        <td><span class="badge bg-danger">Late (2 days)</span></td>
+                                    </tr>
+                                    <tr class="table-success">
+                                        <td>PO-011</td>
+                                        <td>Tom Yum Paste</td>
+                                        <td>Aug 5</td>
+                                        <td>Aug 4</td>
+                                        <td><span class="badge bg-success">Early</span></td>
+                                    </tr>
+                                    <tr class="table-danger">
+                                        <td>PO-013</td>
+                                        <td>Tamarind Paste</td>
+                                        <td>Aug 3</td>
+                                        <td>Aug 5</td>
+                                        <td><span class="badge bg-danger">Late (2 days)</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Delivery Trends</h6>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <p><strong>This Month:</strong> 91% (21/23 orders)</p>
+                                <p><strong>Last Month:</strong> 85% (17/20 orders)</p>
+                                <p><strong>3 Months Ago:</strong> 88% (22/25 orders)</p>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar bg-success" style="width: 91%">91%</div>
+                                </div>
+                                <small class="text-success">+6% improvement vs last month</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Root Causes for Delays</h6>
+                    <ul class="mb-0">
+                        <li><strong>Ingredient shortage (60%):</strong> Missing chili supply from Chonburi caused 2-day delay on PO-008</li>
+                        <li><strong>Equipment breakdown (40%):</strong> Mixing tank maintenance caused delay on PO-013</li>
+                    </ul>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showIngredientShortages() {
+            document.getElementById('managerDetailTitle').textContent = 'Ingredient Shortages (23 Items)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Ingredient</th>
+                                        <th>Current Stock</th>
+                                        <th>Expected Restock</th>
+                                        <th>Priority</th>
+                                        <th>Impact</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="table-danger">
+                                        <td><strong>Thai Red Chilies</strong></td>
+                                        <td>2 days supply</td>
+                                        <td>Aug 16</td>
+                                        <td><span class="badge bg-danger">CRITICAL</span></td>
+                                        <td>PO-001, PO-007 at risk</td>
+                                    </tr>
+                                    <tr class="table-warning">
+                                        <td><strong>Galangal Root</strong></td>
+                                        <td>5 days supply</td>
+                                        <td>Aug 18</td>
+                                        <td><span class="badge bg-warning">HIGH</span></td>
+                                        <td>Green curry production</td>
+                                    </tr>
+                                    <tr class="table-warning">
+                                        <td><strong>Fish Sauce Base</strong></td>
+                                        <td>3 days supply</td>
+                                        <td>Aug 20</td>
+                                        <td><span class="badge bg-warning">HIGH</span></td>
+                                        <td>Multiple sauce lines</td>
+                                    </tr>
+                                    <tr class="table-info">
+                                        <td><strong>Coconut Cream</strong></td>
+                                        <td>8 days supply</td>
+                                        <td>Aug 22</td>
+                                        <td><span class="badge bg-info">MEDIUM</span></td>
+                                        <td>Curry paste production</td>
+                                    </tr>
+                                    <tr class="table-info">
+                                        <td><strong>Tamarind Extract</strong></td>
+                                        <td>6 days supply</td>
+                                        <td>Aug 25</td>
+                                        <td><span class="badge bg-info">MEDIUM</span></td>
+                                        <td>Pad Thai sauce line</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">
+                                            <em>+ 18 more ingredients with shortages...</em>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-danger">
+                            <div class="card-header bg-danger text-white">
+                                <h6 class="mb-0">Production Schedule Impact</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-danger">
+                                    <strong>HIGH RISK:</strong>
+                                    <ul class="mb-0">
+                                        <li>PO-001: May delay by 2-3 days</li>
+                                        <li>PO-007: Production halt possible</li>
+                                    </ul>
+                                </div>
+                                <div class="alert alert-warning">
+                                    <strong>MEDIUM RISK:</strong>
+                                    <ul class="mb-0">
+                                        <li>B-2024-089: Reduced batch size</li>
+                                        <li>B-2024-092: Schedule adjustment needed</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showEquipmentEfficiency() {
+            document.getElementById('managerDetailTitle').textContent = 'Equipment Efficiency & Maintenance';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Equipment Performance by Line</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Equipment</th>
+                                        <th>Efficiency</th>
+                                        <th>Status</th>
+                                        <th>Last Downtime</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Mixing Tank A</strong></td>
+                                        <td>95%</td>
+                                        <td><span class="badge bg-success">Operational</span></td>
+                                        <td>Aug 10 (2hrs)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Grinding Line 1</strong></td>
+                                        <td>92%</td>
+                                        <td><span class="badge bg-success">Operational</span></td>
+                                        <td>Aug 8 (1hr)</td>
+                                    </tr>
+                                    <tr class="table-warning">
+                                        <td><strong>Mixing Tank B</strong></td>
+                                        <td>78%</td>
+                                        <td><span class="badge bg-warning">Maintenance</span></td>
+                                        <td>Aug 12 (4hrs)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Packaging Line 2</strong></td>
+                                        <td>88%</td>
+                                        <td><span class="badge bg-success">Operational</span></td>
+                                        <td>Aug 11 (1.5hrs)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Cooking Vessel 3</strong></td>
+                                        <td>91%</td>
+                                        <td><span class="badge bg-success">Operational</span></td>
+                                        <td>Aug 9 (2.5hrs)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Maintenance Schedule</h6>
+                        <div class="list-group">
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>Mixing Tank B</strong><br>
+                                    <small>Seal replacement</small>
+                                </div>
+                                <span class="badge bg-warning">Today</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>Grinding Line 1</strong><br>
+                                    <small>Blade sharpening</small>
+                                </div>
+                                <span class="badge bg-info">Aug 16</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>Packaging Line 2</strong><br>
+                                    <small>Belt replacement</small>
+                                </div>
+                                <span class="badge bg-info">Aug 18</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <h6>Downtime Reasons (This Week)</h6>
+                            <div class="alert alert-info">
+                                <ul class="mb-0">
+                                    <li><strong>Scheduled maintenance (65%):</strong> Preventive care</li>
+                                    <li><strong>Equipment failure (25%):</strong> Unexpected breakdowns</li>
+                                    <li><strong>Cleaning/sanitation (10%):</strong> Deep cleaning cycles</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        // Processor Dashboard Functions (FIXED - ALL NOW CLICKABLE)
+        function showSupplierPerformance() {
+            document.getElementById('managerDetailTitle').textContent = 'Supplier Performance Analysis (94%)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <h6>Top Performing Suppliers</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr><th>Supplier</th><th>Performance Score</th><th>On-Time Delivery</th><th>Quality Rating</th><th>Response Time</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Chonburi Chili Coop</td><td>98%</td><td>99%</td><td>96%</td><td>2.1 hours</td></tr>
+                            <tr><td>Andaman Fishing</td><td>92%</td><td>95%</td><td>91%</td><td>3.2 hours</td></tr>
+                            <tr><td>Local Coconut Farm</td><td>89%</td><td>87%</td><td>94%</td><td>4.1 hours</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showCriticalShortages() {
+            document.getElementById('managerDetailTitle').textContent = 'Critical Shortages (8 Items)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <h6>Immediate Action Required</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr><th>Item</th><th>Current Stock</th><th>Min Required</th><th>Shortage</th><th>Impact</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr class="table-danger"><td>Thai Red Chilies</td><td>150kg</td><td>500kg</td><td>350kg</td><td>Production halt in 2 days</td></tr>
+                            <tr class="table-warning"><td>Fish Sauce Base</td><td>800L</td><td>1200L</td><td>400L</td><td>Reduced batch sizes</td></tr>
+                            <tr class="table-warning"><td>Galangal Root</td><td>45kg</td><td>80kg</td><td>35kg</td><td>Green curry line affected</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showActivePOs() {
+            document.getElementById('managerDetailTitle').textContent = 'Active Purchase Orders (23 Total)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <h6>Purchase Orders by Status</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr><th>PO ID</th><th>Supplier</th><th>Items</th><th>Value</th><th>Status</th><th>Due Date</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>PO-2024-045</td><td>Chonburi Chili Coop</td><td>Red Chilies (500kg)</td><td>€12,500</td><td><span class="badge bg-success">Delivered</span></td><td>Aug 15</td></tr>
+                            <tr><td>PO-2024-046</td><td>Andaman Fishing</td><td>Fish Sauce Base (800L)</td><td>€8,900</td><td><span class="badge bg-warning">In Transit</span></td><td>Aug 18</td></tr>
+                            <tr><td>PO-2024-047</td><td>Local Coconut Farm</td><td>Coconut Milk (1200L)</td><td>€6,750</td><td><span class="badge bg-info">Ordered</span></td><td>Aug 22</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showLowStockAlerts() {
+            document.getElementById('managerDetailTitle').textContent = 'Low Stock Alerts (12 Items)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <h6>Items Below Minimum Stock Levels</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr><th>Item</th><th>Current</th><th>Minimum</th><th>Days Until Stockout</th><th>Action</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr class="table-danger"><td>Thai Red Chilies</td><td>150kg</td><td>500kg</td><td>2 days</td><td>Emergency order placed</td></tr>
+                            <tr class="table-warning"><td>Tamarind Paste</td><td>120kg</td><td>200kg</td><td>5 days</td><td>Order scheduled</td></tr>
+                            <tr class="table-warning"><td>Lemongrass</td><td>80kg</td><td>150kg</td><td>7 days</td><td>Supplier contacted</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        // Logistics Dashboard Functions (FIXED - ALL NOW CLICKABLE)
+        
+        // Farm Logistics Functions
+        function showReadyForPickup() {
+            document.getElementById('managerDetailTitle').textContent = 'Ready for Pickup (12.5 Tons)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <h6>Items Ready for Collection</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr><th>Product</th><th>Quantity</th><th>Quality Grade</th><th>Harvest Date</th><th>Customer</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Red Chilies</td><td>5.3 tons</td><td>Premium A</td><td>Aug 13</td><td>Bangkok Food Industries</td></tr>
+                            <tr><td>Fresh Fish</td><td>4.2 tons</td><td>Grade 1</td><td>Aug 14</td><td>Bangkok Food Industries</td></tr>
+                            <tr><td>Green Chilies</td><td>3.0 tons</td><td>Premium A</td><td>Aug 14</td><td>Local Processor</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showScheduledDeliveries() {
+            document.getElementById('managerDetailTitle').textContent = 'Scheduled Deliveries (Next 3 Days)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <h6>Upcoming Delivery Schedule</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr><th>Date</th><th>Time</th><th>Customer</th><th>Product</th><th>Quantity</th><th>Driver</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Aug 15</td><td>08:30</td><td>Bangkok Food Industries</td><td>Red Chilies</td><td>3.2 tons</td><td>Somsak T.</td></tr>
+                            <tr><td>Aug 15</td><td>14:00</td><td>Bangkok Food Industries</td><td>Fish Sauce Base</td><td>1.8 tons</td><td>Niran K.</td></tr>
+                            <tr><td>Aug 16</td><td>09:00</td><td>Local Processor</td><td>Green Chilies</td><td>2.1 tons</td><td>Preecha S.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showFarmDeliveryPerformance() {
+            document.getElementById('managerDetailTitle').textContent = 'Farm Delivery Performance (96% Success Rate)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <h6>Delivery Performance Metrics</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5>Last 30 Days</h5>
+                                <p><strong>Total Deliveries:</strong> 47</p>
+                                <p><strong>On-Time:</strong> 45 (96%)</p>
+                                <p><strong>Late:</strong> 2 (4%)</p>
+                                <p><strong>Average Delay:</strong> 1.5 hours</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Late Delivery Analysis</h6>
+                        <ul>
+                            <li><strong>Weather delays:</strong> 1 delivery (heavy rain)</li>
+                            <li><strong>Vehicle breakdown:</strong> 1 delivery (engine trouble)</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        // Processor Logistics Functions
+        function showExportShipments() {
+            document.getElementById('managerDetailTitle').textContent = 'Export Shipments Ready (18 Total)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <h6>Shipments Awaiting Dispatch</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr><th>Container ID</th><th>Destination</th><th>Product Mix</th><th>Value</th><th>Departure Date</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>CONT-TH-2024-145</td><td>Netherlands</td><td>Curry Pastes</td><td>€285K</td><td>Aug 16</td></tr>
+                            <tr><td>CONT-TH-2024-146</td><td>Germany</td><td>Chili Sauces</td><td>€190K</td><td>Aug 17</td></tr>
+                            <tr><td>CONT-TH-2024-147</td><td>France</td><td>Fish Sauces</td><td>€165K</td><td>Aug 18</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showExportDocumentation() {
+            document.getElementById('managerDetailTitle').textContent = 'Export Documentation Status (94% Complete)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <h6>Documentation Completion Status</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr><th>Document Type</th><th>Complete</th><th>Pending</th><th>Completion %</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Health Certificates</td><td>17</td><td>1</td><td>94%</td></tr>
+                            <tr><td>Commercial Invoices</td><td>18</td><td>0</td><td>100%</td></tr>
+                            <tr><td>Customs Declarations</td><td>16</td><td>2</td><td>89%</td></tr>
+                            <tr><td>Bills of Lading</td><td>15</td><td>3</td><td>83%</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showExportCompliance() {
+            document.getElementById('managerDetailTitle').textContent = 'Export Compliance Score (98%)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <h6>Compliance Breakdown by Category</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr><th>Category</th><th>Score</th><th>Status</th><th>Notes</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr class="table-success"><td>Health & Safety</td><td>99%</td><td>Excellent</td><td>All certifications current</td></tr>
+                            <tr class="table-success"><td>Documentation</td><td>96%</td><td>Very Good</td><td>Minor delays in 2 cases</td></tr>
+                            <tr class="table-success"><td>Product Standards</td><td>100%</td><td>Perfect</td><td>All products meet EU standards</td></tr>
+                            <tr class="table-success"><td>Traceability</td><td>98%</td><td>Excellent</td><td>Complete supply chain tracking</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showFreightCosts() {
+            document.getElementById('managerDetailTitle').textContent = 'Monthly Freight Cost Analysis (€87K)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <h6>Freight Cost Breakdown</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5>August 2025: €87K</h5>
+                                <p><strong>Ocean Freight:</strong> €65K (75%)</p>
+                                <p><strong>Land Transport:</strong> €15K (17%)</p>
+                                <p><strong>Documentation:</strong> €4K (5%)</p>
+                                <p><strong>Insurance:</strong> €3K (3%)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="alert alert-warning">
+                            <h6>Cost Analysis</h6>
+                            <p><strong>vs Target:</strong> +8% (€6.5K over)</p>
+                            <p><strong>vs Last Month:</strong> +12% (€9K increase)</p>
+                            <p><strong>Main Driver:</strong> Fuel surcharges up 15%</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        // Importer Logistics Functions
+        function showIncomingContainers() {
+            document.getElementById('managerDetailTitle').textContent = 'Incoming Containers (Next 7 Days)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <h6>Expected Container Arrivals</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr><th>Container ID</th><th>Origin</th><th>Product</th><th>ETA</th><th>Port</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>CONT-TH-2024-145</td><td>Bangkok</td><td>Curry Products</td><td>Aug 16</td><td>Rotterdam</td><td><span class="badge bg-success">On Schedule</span></td></tr>
+                            <tr><td>CONT-TH-2024-146</td><td>Bangkok</td><td>Chili Sauces</td><td>Aug 17</td><td>Hamburg</td><td><span class="badge bg-warning">Delayed 1 day</span></td></tr>
+                            <tr><td>CONT-TH-2024-147</td><td>Bangkok</td><td>Fish Sauces</td><td>Aug 19</td><td>Le Havre</td><td><span class="badge bg-success">On Schedule</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showCustomsClearance() {
+            document.getElementById('managerDetailTitle').textContent = 'Customs Clearance Queue (5 Containers)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <h6>Containers Awaiting Clearance</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr><th>Container ID</th><th>Port</th><th>Arrival</th><th>Status</th><th>Est. Clearance</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>CONT-TH-2024-142</td><td>Rotterdam</td><td>Aug 12</td><td><span class="badge bg-warning">Document Review</span></td><td>Aug 15</td></tr>
+                            <tr><td>CONT-TH-2024-143</td><td>Hamburg</td><td>Aug 13</td><td><span class="badge bg-info">Physical Inspection</span></td><td>Aug 16</td></tr>
+                            <tr><td>CONT-TH-2024-144</td><td>Le Havre</td><td>Aug 14</td><td><span class="badge bg-warning">Payment Processing</span></td><td>Aug 16</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showImportCompliance() {
+            document.getElementById('managerDetailTitle').textContent = 'Import Compliance Score (97%)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <h6>EU Import Compliance Breakdown</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr><th>Compliance Area</th><th>Score</th><th>Status</th><th>Notes</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr class="table-success"><td>Health Certificates</td><td>98%</td><td>Excellent</td><td>1 minor correction needed</td></tr>
+                            <tr class="table-success"><td>Product Labeling</td><td>100%</td><td>Perfect</td><td>All labels EU compliant</td></tr>
+                            <tr class="table-success"><td>Duty Payments</td><td>95%</td><td>Very Good</td><td>2 payments delayed</td></tr>
+                            <tr class="table-success"><td>Documentation</td><td>96%</td><td>Very Good</td><td>Minor delays in processing</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showClearanceTime() {
+            document.getElementById('managerDetailTitle').textContent = 'Average Clearance Time Analysis (2.4 Days)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <h6>Clearance Time Trends</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5>Performance vs Target</h5>
+                                <p><strong>Current Average:</strong> 2.4 days</p>
+                                <p><strong>Target:</strong> 2.0 days</p>
+                                <p><strong>Variance:</strong> +0.4 days (20% over)</p>
+                                <p><strong>Best Time:</strong> 1.2 days</p>
+                                <p><strong>Worst Time:</strong> 4.1 days</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Delay Factors</h6>
+                        <ul>
+                            <li><strong>Document issues (40%):</strong> Incomplete paperwork</li>
+                            <li><strong>Physical inspection (35%):</strong> Random customs checks</li>
+                            <li><strong>Payment delays (25%):</strong> Banking processing time</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        // Supplier Dashboard Functions (FIXED - ALL NOW CLICKABLE)
+        function showHarvestVolume() {
+            document.getElementById('managerDetailTitle').textContent = 'Monthly Harvest Volume (145 Tons)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <h6>Harvest Breakdown by Product</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr><th>Product</th><th>This Month</th><th>Last Month</th><th>Change</th><th>Quality Grade</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Red Chilies</td><td>68 tons</td><td>58 tons</td><td class="text-success">+17%</td><td>Premium A</td></tr>
+                            <tr><td>Green Chilies</td><td>42 tons</td><td>35 tons</td><td class="text-success">+20%</td><td>Grade 1</td></tr>
+                            <tr><td>Fresh Fish</td><td>35 tons</td><td>30 tons</td><td class="text-success">+17%</td><td>Grade 1</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="alert alert-success mt-3">
+                    <strong>Overall Performance:</strong> +18% increase vs last month due to favorable weather conditions and improved farming techniques.
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showMonthlyRevenue() {
+            document.getElementById('managerDetailTitle').textContent = 'Monthly Revenue Analysis (€284K)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <h6>Revenue Breakdown by Customer</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr><th>Customer</th><th>Revenue</th><th>% of Total</th><th>Orders</th><th>Avg Order Value</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Bangkok Food Industries</td><td>€156K</td><td>55%</td><td>8</td><td>€19.5K</td></tr>
+                            <tr><td>Local Food Processors</td><td>€78K</td><td>27%</td><td>12</td><td>€6.5K</td></tr>
+                            <tr><td>Regional Distributors</td><td>€35K</td><td>12%</td><td>6</td><td>€5.8K</td></tr>
+                            <tr><td>Export Markets</td><td>€15K</td><td>6%</td><td>3</td><td>€5.0K</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="alert alert-info mt-3">
+                    <strong>Growth Drivers:</strong> Increased demand from Bangkok Food Industries (+25%) and expansion into new export markets.
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+
+        function showOrderFulfillment() {
+            document.getElementById('managerDetailTitle').textContent = 'Order Fulfillment Performance (96%)';
+            document.getElementById('managerDetailContent').innerHTML = `
+                <h6>Fulfillment Metrics</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5>August 2025 Performance</h5>
+                                <p><strong>Total Orders:</strong> 29</p>
+                                <p><strong>On-Time Delivery:</strong> 28 (96%)</p>
+                                <p><strong>Late Delivery:</strong> 1 (4%)</p>
+                                <p><strong>Average Lead Time:</strong> 2.3 days</p>
+                                <p><strong>Quality Rejections:</strong> 0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Performance Trends</h6>
+                        <ul>
+                            <li><strong>July 2025:</strong> 94% on-time delivery</li>
+                            <li><strong>June 2025:</strong> 91% on-time delivery</li>
+                            <li><strong>May 2025:</strong> 89% on-time delivery</li>
+                        </ul>
+                        <div class="alert alert-success">
+                            <strong>Improvement Trend:</strong> Consistent month-over-month improvement in delivery performance.
+                        </div>
+                    </div>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('managerDetailModal')).show();
+        }
+    </script>
+</body>
+</html>
